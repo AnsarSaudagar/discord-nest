@@ -12,6 +12,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { User } from '../entities/user.entity';
 import { AuthGuard } from './auth.guard';
+import { LoginDto } from '../dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -39,7 +40,7 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() credentials: any) {
+  async login(@Body() credentials: LoginDto) {
     try {
       return await this.authService.login(
         credentials.email,
