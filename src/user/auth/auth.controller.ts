@@ -42,7 +42,11 @@ export class AuthController {
         credentials.password,
       );
     } catch (error) {
-      console.log(error.message);
+
+    if(error.message === "Unauthorized"){
+        error.message = "Please Enter a valid password"
+    }
+
       throw new HttpException(
         { message: error.message, error: 'Internal Server Error' },
         HttpStatus.INTERNAL_SERVER_ERROR,
