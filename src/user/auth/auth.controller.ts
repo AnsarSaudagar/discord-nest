@@ -13,13 +13,11 @@ import { User } from '../entities/user.entity';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('register')
   async register(@Body() userData: CreateUserDto) {
     try {
-        
-      const user : User = await this.authService.register(userData);
+      const user: User = await this.authService.register(userData);
       return user;
-
     } catch (error) {
       if (error.code === 11000) {
         const field = error.keyValue.email ? 'Email' : 'Username';
@@ -29,6 +27,22 @@ export class AuthController {
         );
       }
 
+      throw new HttpException(
+        { message: error.message, error: 'Internal Server Error' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('login')
+  async login(@Body() credentials: any) {
+    try {
+      return await this.authService.login(
+        credentials.email,
+        credentials.password,
+      );
+    } catch (error) {
+      console.log(error.message);
       throw new HttpException(
         { message: error.message, error: 'Internal Server Error' },
         HttpStatus.INTERNAL_SERVER_ERROR,
