@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthService } from './auth.service';
+import { User } from '../entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -15,8 +16,10 @@ export class AuthController {
   @Post()
   async register(@Body() userData: CreateUserDto) {
     try {
-      const user = await this.authService.register(userData);
-      return { message: 'User created successfully', data: user };
+        
+      const user : User = await this.authService.register(userData);
+      return user;
+
     } catch (error) {
       if (error.code === 11000) {
         const field = error.keyValue.email ? 'Email' : 'Username';
