@@ -18,7 +18,7 @@ import { LoginDto } from '../dto/login.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post('signup')
   async register(@Body() userData: CreateUserDto) {
     try {
       const user: User = await this.authService.register(userData);
