@@ -23,12 +23,12 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Get('me')
   getProfile(@Request() req) {
-    return this.userService.findOne(req.user.sub);
+    return this.userService.findOne(+req.user.sub);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return this.userService.findOne(+id);
   }
 
   @Patch(':id')

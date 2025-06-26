@@ -1,15 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Model } from 'mongoose';
 import { User } from '../entities/user.entity';
-import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
 
@@ -27,21 +27,20 @@ export class AuthService {
 
     userData.password = hashPassword;
 
-    const newUser = new this.userModel(userData);
+    const newUser = this.userRepository.create(userData);
 
-    return newUser.save();
+    return this.userRepository.save(newUser);
   }
 
   async login(
     email: string,
     password: string,
   ): Promise<{ access_token: string }> {
-    const user: any = await this.userModel
-      .findOne()
-      .where({
+    const user = await this.userRepository.findOne({
+      where: {
         email: email,
-      })
-      .exec();
+      },
+    });
 
     if (!user) {        
       throw new Error('Please Enter a valid mail');
@@ -53,7 +52,7 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = { sub: user._id, email: user.email , username: user.username};
+    const payload = { sub: user.id, email: user.email , username: user.username};
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

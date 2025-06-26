@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './entities/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
@@ -17,7 +17,7 @@ import { AuthGuard } from './auth/auth.guard';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '3600s' },
     }),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [UserController, AuthController],
   providers: [UserService, AuthService, AuthGuard],
