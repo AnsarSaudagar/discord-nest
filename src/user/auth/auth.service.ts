@@ -57,4 +57,13 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
+
+  createToken(user: any) {
+    const payload = {
+      sub: user.id,           // your user ID from DB
+      email: user.email,      // or anything else
+    };
+
+    return this.jwtService.sign(payload);
+  }
 }

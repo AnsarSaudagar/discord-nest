@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -68,8 +69,13 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  googleRedirect(@Request() req) {
-    return req.user;
+  async googleRedirect(@Request() req, @Res() res) {
+    // Example: issue JWT or session cookie here
+  
+    const token = this.authService.createToken(req.user);
+  
+    // Redirect to your Angular app with token in URL
+    return res.redirect(`http://localhost:4200?token=${token}`);
   }
 
   @Get('google')
