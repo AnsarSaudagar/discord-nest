@@ -11,8 +11,9 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { User } from '../entities/user.entity';
-import { AuthGuard } from './auth.guard';
+import { AuthCustomGuard } from './auth.guard';
 import { LoginDto } from '../dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -59,9 +60,21 @@ export class AuthController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthCustomGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
+  }
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  googleRedirect(@Request() req) {
+    return req.user;
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleLogin() {
+    // Redirects to Google login
   }
 }

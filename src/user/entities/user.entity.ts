@@ -32,6 +32,9 @@ export class User {
   @Column({ default: 1 })
   is_active: boolean;
 
+  @Column({ nullable: true })
+  gender: string;
+  
   @CreateDateColumn()
   created_at: Date;
 

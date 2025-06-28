@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request }
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthCustomGuard } from './auth/auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -20,7 +20,7 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthCustomGuard)
   @Get('me')
   getProfile(@Request() req) {
     return this.userService.findOne(+req.user.sub);

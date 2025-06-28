@@ -7,7 +7,8 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthCustomGuard } from './auth/auth.guard';
+import { GoogleStrategy } from './auth/google.strategy';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AuthGuard } from './auth/auth.guard';
     }),
     TypeOrmModule.forFeature([User]),
   ],
-  controllers: [UserController, AuthController],
-  providers: [UserService, AuthService, AuthGuard],
+  controllers: [UserController, AuthController, ],
+  providers: [UserService, AuthService, AuthCustomGuard, GoogleStrategy],
 })
 export class UserModule {}
