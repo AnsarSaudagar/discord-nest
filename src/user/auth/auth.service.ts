@@ -46,7 +46,7 @@ export class AuthService {
       throw new Error('Please Enter a valid mail');
     }
     
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
       throw new UnauthorizedException();
