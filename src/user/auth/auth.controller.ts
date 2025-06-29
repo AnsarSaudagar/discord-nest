@@ -9,12 +9,14 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { User } from '../entities/user.entity';
 import { AuthCustomGuard } from './auth.guard';
 import { LoginDto } from '../dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { log } from 'console';
 
 @Controller('auth')
 export class AuthController {
@@ -49,10 +51,9 @@ export class AuthController {
         credentials.password,
       );
     } catch (error) {
-
-    if(error.message === "Unauthorized"){
-        error.message = "Please Enter a valid password"
-    }
+      if (error.message === 'Unauthorized') {
+        error.message = 'Please Enter a valid password';
+      }
 
       throw new HttpException(
         { message: error.message, error: 'Internal Server Error' },
@@ -61,7 +62,17 @@ export class AuthController {
     }
   }
 
-  @UseGuards(AuthCustomGuard)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    });
+    return { message: 'Logged out' };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
@@ -70,12 +81,31 @@ export class AuthController {
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
   async googleRedirect(@Request() req, @Res() res) {
-    // Example: issue JWT or session cookie here
-  
-    const token = this.authService.createToken(req.user);
-  
-    // Redirect to your Angular app with token in URL
-    return res.redirect(`http://localhost:4200?token=${token}`);
+    // console.log(req.user);
+
+    let user: User = await this.authService.getUserFromEmail(req.user.email);
+    if (!user) {
+      const userData: any = {
+        email: req.user.email,
+        username: req.user.name,
+        provider: 'google',
+        profile_picture: req.user.picture,
+      };
+      const newUser: any =
+        await this.authService.createUserFromGoogle(userData);
+      user = newUser;
+    }
+    const token = this.authService.createToken({ ...user });
+
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      // maxAge: 1000 * 60 * 60, // 1h
+      maxAge: 1000 * 30, // 30sec
+    });
+
+    return res.redirect(`http://localhost:4200`);
   }
 
   @Get('google')

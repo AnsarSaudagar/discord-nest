@@ -32,7 +32,7 @@ export class CreateUsersTable1734894500000 implements MigrationInterface {
             name: 'password_hash',
             type: 'varchar',
             length: '255',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'dob',
@@ -57,6 +57,18 @@ export class CreateUsersTable1734894500000 implements MigrationInterface {
             type: 'boolean',
             default: true,
             isNullable: false,
+          },
+          {
+            name: 'gender',
+            type: 'varchar',
+            length: '255',
+            isNullable: true,
+          },
+          {
+            name: 'provider',
+            type: 'varchar',
+            length: '255',
+            isNullable: true,
           },
           {
             name: 'created_at',

@@ -60,10 +60,24 @@ export class AuthService {
 
   createToken(user: any) {
     const payload = {
-      sub: user.id,           // your user ID from DB
-      email: user.email,      // or anything else
+      sub: user.id,
+      email: user.email,
+      username: user.username,
     };
 
-    return this.jwtService.sign(payload);
+    return this.jwtService.sign(payload, { expiresIn: '30sec' });
+  }
+
+  getUserFromEmail(email: string) {
+    return this.userRepository.findOne({
+      where: {
+        email: email,
+      },
+    });
+  }
+
+  createUserFromGoogle(user: any) {
+    const newUser = this.userRepository.create(user);
+    return this.userRepository.save(newUser);
   }
 }

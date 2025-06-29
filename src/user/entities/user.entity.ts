@@ -17,7 +17,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password_hash: string;
 
   @Column({ nullable: true })
@@ -34,6 +34,9 @@ export class User {
 
   @Column({ nullable: true })
   gender: string;
+
+  @Column({ nullable: true })
+  provider: string;
   
   @CreateDateColumn()
   created_at: Date;
