@@ -2,7 +2,9 @@ export class CreateUserDto {
   username: string;
   email: string;
   password: string;
-  display_name: string;
-  dob: string;
-  is_email_verified: boolean;
+  password_hash?: string;
+  gender?: string;
+  birthday?: string;
+  provider?: string;
+  profile_picture?: string;
 }

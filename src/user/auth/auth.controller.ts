@@ -22,16 +22,18 @@ import { log } from 'console';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
+  @Post('register')
   async register(@Body() userData: CreateUserDto) {
     try {
       const user: User = await this.authService.register(userData);
+
       return user;
     } catch (error) {
-      if (error.code === 11000) {
-        const field = error.keyValue.email ? 'Email' : 'Username';
+      console.log(error);
+
+      if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(
-          { message: `${field} Already Exists`, error: 'Bad Request' },
+          { message: `Email Already Exists`, error: 'Bad Request' },
           HttpStatus.BAD_REQUEST,
         );
       }

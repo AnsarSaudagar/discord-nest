@@ -25,7 +25,7 @@ export class AuthService {
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(userData.password, saltRounds);
 
-    userData.password = hashPassword;
+    userData.password_hash = hashPassword;
 
     const newUser = this.userRepository.create(userData);
 
