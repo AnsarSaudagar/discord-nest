@@ -22,6 +22,11 @@ import { log } from 'console';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('test')
+  test() {
+    return { message: 'Hello World' };
+  }
+
   @Post('register')
   async register(@Body() userData: CreateUserDto) {
     try {
@@ -46,13 +51,25 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() credentials: LoginDto) {
+  async login(@Body() credentials: LoginDto, @Res() res: Response) {
     try {
-      return await this.authService.login(
+      
+      const token = await this.authService.login(
         credentials.email,
         credentials.password,
       );
+
+      res.cookie('jwt', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 60, // 1 hour
+      });
+      
+      return res.json({ status: 'success' });
     } catch (error) {
+      console.log(error);
+      
       if (error.message === 'Unauthorized') {
         error.message = 'Please Enter a valid password';
       }
@@ -103,8 +120,8 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      // maxAge: 1000 * 60 * 60, // 1h
-      maxAge: 1000 * 30, // 30sec
+      maxAge: 1000 * 60 * 60, // 1h
+      // maxAge: 1000 * 30, // 30sec
     });
 
     return res.redirect(`http://localhost:4200`);

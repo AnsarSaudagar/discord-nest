@@ -35,7 +35,7 @@ export class AuthService {
   async login(
     email: string,
     password: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<string> {
     const user = await this.userRepository.findOne({
       where: {
         email: email,
@@ -45,7 +45,7 @@ export class AuthService {
     if (!user) {        
       throw new Error('Please Enter a valid mail');
     }
-    
+
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
@@ -53,9 +53,8 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email , username: user.username};
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 
   createToken(user: any) {
@@ -65,7 +64,7 @@ export class AuthService {
       username: user.username,
     };
 
-    return this.jwtService.sign(payload, { expiresIn: '30sec' });
+    return this.jwtService.sign(payload, { expiresIn: '1h' });
   }
 
   getUserFromEmail(email: string) {
