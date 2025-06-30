@@ -1,11 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { Organization } from './entities/organization.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class OrganizationsService {
-  create(createOrganizationDto: CreateOrganizationDto) {
-    return 'This action adds a new organization';
+
+  constructor(
+    @InjectRepository(Organization)
+    private organizationRepository: Repository<Organization>,
+  ) {}
+
+  create(createOrganizationDto: CreateOrganizationDto, userId: number) {
+    const organization = this.organizationRepository.create({
+      ...createOrganizationDto,
+      owner_id: userId,
+    });
+    return this.organizationRepository.save(organization);
   }
 
   findAll() {
