@@ -21,8 +21,9 @@ export class OrganizationsController {
   }
 
   @Get()
-  findAll() {
-    return this.organizationsService.findAll();
+  @UseGuards(AuthGuard('jwt'))
+  findAll(@UserId() userId: number) {
+    return this.organizationsService.findAll(userId);
   }
 
   @Get(':id')

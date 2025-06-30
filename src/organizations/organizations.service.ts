@@ -21,8 +21,12 @@ export class OrganizationsService {
     return this.organizationRepository.save(organization);
   }
 
-  findAll() {
-    return `This action returns all organizations`;
+  findAll(userId: number) {
+    return this.organizationRepository.find({
+      where: {
+        owner_id: userId,
+      },
+    });
   }
 
   findOne(id: number) {
