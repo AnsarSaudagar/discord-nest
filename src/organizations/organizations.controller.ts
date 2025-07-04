@@ -17,6 +17,7 @@ export class OrganizationsController {
     @UserId() userId: number,
     @CurrentUser() user: User,
   ) {
+
     return this.organizationsService.create(createOrganizationDto, userId);
   }
 

@@ -4,6 +4,7 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { Organization } from './entities/organization.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { OrgMembersService } from './org_members/org_members.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -11,14 +12,22 @@ export class OrganizationsService {
   constructor(
     @InjectRepository(Organization)
     private organizationRepository: Repository<Organization>,
+    private orgMembersService: OrgMembersService,
   ) {}
 
-  create(createOrganizationDto: CreateOrganizationDto, userId: number) {
+  async create(createOrganizationDto: CreateOrganizationDto, userId: number) {
+    
+    
     const organization = this.organizationRepository.create({
       ...createOrganizationDto,
       owner_id: userId,
     });
-    return this.organizationRepository.save(organization);
+    
+    const org = await this.organizationRepository.save(organization);
+    
+    this.orgMembersService.create({...createOrganizationDto, user_id: userId, organization_id: org.id});
+
+    return org.id;
   }
 
   findAll(userId: number) {
