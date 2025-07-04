@@ -1,10 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { OrgMembersService } from './org_members.service';
 import { CreateOrgMemberDto } from './dto/create-org_member.dto';
 import { UpdateOrgMemberDto } from './dto/update-org_member.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UserId } from 'src/user/auth/user.decorator';
-import { MemberRole, MemberStatus } from './entities/org_member.entity';
+import {
+  MemberRole,
+  MemberStatus,
+  OrgMember,
+} from './entities/org_member.entity';
 
 @Controller('org-members')
 export class OrgMembersController {
@@ -17,7 +30,7 @@ export class OrgMembersController {
       ...createOrgMemberDto,
       role: MemberRole.MEMBER,
       status: MemberStatus.ACTIVE,
-    }
+    };
     return this.orgMembersService.create(data);
   }
 
@@ -32,12 +45,25 @@ export class OrgMembersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrgMemberDto: UpdateOrgMemberDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateOrgMemberDto: UpdateOrgMemberDto,
+  ) {
     return this.orgMembersService.update(+id, updateOrgMemberDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orgMembersService.remove(+id);
+  }
+
+  @Post('join/:org_id')
+  @UseGuards(AuthGuard('jwt'))
+  join(@Param('org_id') org_id: number, @UserId() userId: number) {
+    return this.orgMembersService.create(
+      { user_id: userId, organization_id: org_id },
+      null,
+      MemberRole.MEMBER,
+    );
   }
 }
