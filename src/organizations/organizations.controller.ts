@@ -23,7 +23,9 @@ export class OrganizationsController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  findAll(@UserId() userId: number) {
+  async findAll(@UserId() userId: number) {
+    // console.log(this.organizationsService.findAllWithMembers(userId));
+    
     return this.organizationsService.findAll(userId);
   }
 

@@ -25,7 +25,13 @@ export class OrganizationsService {
     
     const org = await this.organizationRepository.save(organization);
     
-    this.orgMembersService.create({ user_id: userId, organization_id: org.id, owner_id: userId});
+    // Add the owner as a member with OWNER role
+    await this.orgMembersService.create({ 
+      user_id: userId, 
+      organization_id: org.id, 
+      role: 3, // MemberRole.OWNER
+      status: 1 // MemberStatus.ACTIVE
+    });
 
     return org.id;
   }
@@ -35,11 +41,48 @@ export class OrganizationsService {
       where: {
         owner_id: userId,
       },
+      relations: ['owner'], // This will join with User entity
     });
   }
 
+  // Method 2: Using QueryBuilder with joins
+  async findAllWithMembers(userId: number) {
+    const orgs = await this.organizationRepository
+      .createQueryBuilder('org')
+      .leftJoin('org_members', 'members', 'members.organization_id = org.id') // Join members
+      .addSelect(['members.id', 'members.role', 'members.status']) // Select specific member fields
+      .where('members.user_id = :userId', { userId })
+      .getMany();
+    
+    console.log(orgs);
+      
+    return orgs;
+  }
+
+  // Method 3: Find organization with all members
+  async findOneWithMembers(id: number) {
+    return this.organizationRepository.findOne({
+      where: { id },
+      relations: ['owner'], // Join with owner
+    });
+  }
+
+  // Method 4: Complex join with conditions
+  async findOrganizationsWhereUserIsMember(userId: number) {
+    return this.organizationRepository
+      .createQueryBuilder('org')
+      .leftJoinAndSelect('org.owner', 'owner')
+      .innerJoin('org_members', 'members', 'members.organization_id = org.id')
+      .where('members.user_id = :userId', { userId })
+      .andWhere('members.status = :status', { status: 1 }) // Active members only
+      .getMany();
+  }
+
   findOne(id: number) {
-    return `This action returns a #${id} organization`;
+    return this.organizationRepository.findOne({
+      where: { id },
+      relations: ['owner'], // Join with owner information
+    });
   }
 
   update(id: number, updateOrganizationDto: UpdateOrganizationDto) {
