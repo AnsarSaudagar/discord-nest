@@ -45,14 +45,24 @@ export class OrganizationsService {
     });
   }
 
-  // Method 2: Using QueryBuilder with joins
+  // Method 2: Get organizations where user is member, with total member count
   async findAllWithMembers(userId: number) {
     const orgs = await this.organizationRepository
       .createQueryBuilder('org')
-      .leftJoin('org_members', 'members', 'members.organization_id = org.id') // Join members
-      .addSelect(['members.id', 'members.role', 'members.status']) // Select specific member fields
-      .where('members.user_id = :userId', { userId })
-      .getMany();
+      .select([
+        'org.id as id',
+        'org.name as name', 
+        'org.description as description',
+        'org.owner_id as owner_id',
+        'org.allow_public_join as allow_public_join',
+        'org.require_approval as require_approval',
+        'org.created_at as created_at'
+      ])
+      .leftJoin('org_members', 'orm', 'orm.organization_id = org.id')
+      .addSelect('COUNT(orm.id)', 'members')
+      .where('org.id IN (SELECT organization_id FROM org_members WHERE user_id = :userId)', { userId })
+      .groupBy('org.id')
+      .getRawMany();
     
     console.log(orgs);
       
