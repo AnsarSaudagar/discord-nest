@@ -25,7 +25,7 @@ export class OrganizationsService {
     
     const org = await this.organizationRepository.save(organization);
     
-    this.orgMembersService.create({...createOrganizationDto, user_id: userId, organization_id: org.id});
+    this.orgMembersService.create({ user_id: userId, organization_id: org.id, owner_id: userId});
 
     return org.id;
   }

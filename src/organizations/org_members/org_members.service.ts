@@ -11,9 +11,9 @@ export class OrgMembersService {
     private orgMemberRepository: Repository<OrgMember>,
   ) {}
 
-  create(createOrgMemberDto: any, status: MemberStatus = null, role: MemberRole = null) {
+  create(createOrgMemberDto: CreateOrgMemberDto, status: MemberStatus = null, role: MemberRole = null) {
 
-    if(createOrgMemberDto.userId === createOrgMemberDto.owner_id) {
+    if(createOrgMemberDto.user_id === createOrgMemberDto.owner_id) {
       role = MemberRole.OWNER;
     }
 
