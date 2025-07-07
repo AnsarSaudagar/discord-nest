@@ -5,6 +5,7 @@ import { Organization } from './entities/organization.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgMembersService } from './org_members/org_members.service';
+import { MemberRole, MemberStatus } from './org_members/entities/org_member.entity';
 
 @Injectable()
 export class OrganizationsService {
@@ -29,8 +30,8 @@ export class OrganizationsService {
     await this.orgMembersService.create({ 
       user_id: userId, 
       organization_id: org.id, 
-      role: 3, // MemberRole.OWNER
-      status: 1 // MemberStatus.ACTIVE
+      role: MemberRole.OWNER, 
+      status: MemberStatus.ACTIVE 
     });
 
     return org.id;

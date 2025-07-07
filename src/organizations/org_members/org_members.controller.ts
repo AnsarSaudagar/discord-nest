@@ -61,9 +61,7 @@ export class OrgMembersController {
   @UseGuards(AuthGuard('jwt'))
   join(@Param('org_id') org_id: number, @UserId() userId: number) {
     return this.orgMembersService.create(
-      { user_id: userId, organization_id: org_id },
-      null,
-      MemberRole.MEMBER,
+      { user_id: userId, organization_id: org_id, role: MemberRole.MEMBER, status: MemberStatus.ACTIVE }
     );
   }
 }

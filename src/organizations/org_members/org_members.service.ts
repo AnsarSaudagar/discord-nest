@@ -11,17 +11,14 @@ export class OrgMembersService {
     private orgMemberRepository: Repository<OrgMember>,
   ) {}
 
-  create(createOrgMemberDto: CreateOrgMemberDto, status: MemberStatus = null, role: MemberRole = null) {
+  create(createOrgMemberDto: CreateOrgMemberDto) {
 
-    if(createOrgMemberDto.user_id === createOrgMemberDto.owner_id) {
-      role = MemberRole.OWNER;
-    }
 
     const data = {
       user_id: createOrgMemberDto.user_id,
       organization_id: createOrgMemberDto.organization_id,
-      role,
-      status: status || MemberStatus.ACTIVE,
+      role :createOrgMemberDto.role || MemberRole.MEMBER,
+      status: createOrgMemberDto.status || MemberStatus.ACTIVE,
     }
     
     return this.orgMemberRepository.save(data);
